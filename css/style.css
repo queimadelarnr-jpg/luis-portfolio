@@ -743,6 +743,7 @@ h1 {
     scrollbar-width: thin;
     scrollbar-color: var(--black) transparent;
     -webkit-overflow-scrolling: touch;
+    overflow-anchor: none;
     user-select: none;
     outline: none;
 }
@@ -894,6 +895,31 @@ h1 {
 ========================================= */
 
 @media (max-width: 900px) {
+
+    .name {
+        padding: 14px 16px;
+    }
+
+    .title {
+        width: 100%;
+        margin: 0;
+        font-size: clamp(18px, 6.2vw, 28px);
+        line-height: 1.1;
+        white-space: nowrap;
+    }
+
+    .name-letter {
+        width: auto !important;
+        height: auto;
+        overflow: visible;
+        line-height: inherit;
+        vertical-align: baseline;
+    }
+
+    .name-letter-value {
+        height: auto;
+        line-height: inherit;
+    }
 
     .menu {
         position: relative;
@@ -1286,21 +1312,30 @@ h1 {
         grid-template-columns: 1fr;
         grid-template-rows: repeat(2, minmax(0, 1fr));
         align-items: stretch;
-        gap: 14px;
-        padding: 20px;
+        gap: 12px;
+        padding: 14px 12px;
     }
 
     .work-card {
         height: 100%;
         min-height: 0;
-        aspect-ratio: 4 / 5;
+        aspect-ratio: 9 / 10;
+    }
+
+    .work-card::after {
+        background: linear-gradient(
+            to top,
+            rgba(0, 0, 0, .92) 0%,
+            rgba(0, 0, 0, .62) 48%,
+            rgba(0, 0, 0, .18) 100%
+        );
     }
 
     .work-card-copy {
     position: absolute;
     top: 70%;
     left: 50%;
-    z-index: 1;
+    z-index: 3;
 
     width: 100%;
     padding: 20px;

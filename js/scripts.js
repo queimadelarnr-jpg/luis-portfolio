@@ -346,7 +346,7 @@ const homeTitleLink = document.querySelector(
 );
 
 const nameSlotCanAnimate = window.matchMedia(
-    "(hover: hover) and (pointer: fine)"
+    "(min-width: 901px) and (hover: hover) and (pointer: fine)"
 );
 
 const nameSlotReducedMotion = window.matchMedia(
@@ -806,6 +806,10 @@ const aboutContentLines = Array
         return line.textContent.trim().length > 0;
     });
 
+const aboutMobileLayout = window.matchMedia(
+    "(max-width: 900px)"
+);
+
 aboutContentLines.forEach((line, index) => {
     line.style.setProperty(
         "--enter-delay",
@@ -817,7 +821,9 @@ let focusedAboutIndex = 0;
 let aboutWheelLocked = false;
 let aboutWheelTotal = 0;
 let aboutTouchStartY = null;
+let aboutTouchFocusY = null;
 let aboutScrollTimer = null;
+let aboutFocusFrame = null;
 
 function keepAboutLineVisible(line, behavior = "smooth") {
     if (!aboutMe || !line) return;
@@ -856,7 +862,7 @@ function scheduleAboutLineScroll(line) {
     }, 720);
 }
 
-function setAboutFocus(index) {
+function setAboutFocus(index, keepVisible = true) {
     const safeIndex = Math.max(0, Math.min(index, aboutContentLines.length - 1));
 
     if (safeIndex === focusedAboutIndex && aboutContentLines[safeIndex]?.classList.contains("in-focus")) {
@@ -869,7 +875,81 @@ function setAboutFocus(index) {
         line.classList.toggle("in-focus", lineIndex === safeIndex);
     });
 
-    scheduleAboutLineScroll(aboutContentLines[safeIndex]);
+    if (keepVisible) {
+        scheduleAboutLineScroll(aboutContentLines[safeIndex]);
+    }
+}
+
+function updateMobileAboutFocus() {
+    if (
+        !aboutMe ||
+        !aboutMobileLayout.matches ||
+        !aboutContentLines.length
+    ) {
+        return;
+    }
+
+    const maximumScroll = Math.max(
+        0,
+        aboutMe.scrollHeight - aboutMe.clientHeight
+    );
+
+    if (
+        aboutTouchFocusY === null &&
+        aboutMe.scrollTop <= 1
+    ) {
+        setAboutFocus(0, false);
+        return;
+    }
+
+    if (
+        aboutTouchFocusY === null &&
+        maximumScroll > 0 &&
+        aboutMe.scrollTop >= maximumScroll - 1
+    ) {
+        setAboutFocus(aboutContentLines.length - 1, false);
+        return;
+    }
+
+    const containerRect = aboutMe.getBoundingClientRect();
+    const focusPosition = aboutTouchFocusY ?? (
+        containerRect.top + Math.min(
+            containerRect.height * 0.3,
+            150
+        )
+    );
+
+    let nextFocusIndex = 0;
+    let nearestDistance = Number.POSITIVE_INFINITY;
+
+    aboutContentLines.forEach((line, lineIndex) => {
+        const lineRect = line.getBoundingClientRect();
+        let distance = 0;
+
+        if (focusPosition < lineRect.top) {
+            distance = lineRect.top - focusPosition;
+        } else if (focusPosition > lineRect.bottom) {
+            distance = focusPosition - lineRect.bottom;
+        }
+
+        if (distance < nearestDistance) {
+            nearestDistance = distance;
+            nextFocusIndex = lineIndex;
+        }
+    });
+
+    setAboutFocus(nextFocusIndex, false);
+}
+
+function requestMobileAboutFocusUpdate() {
+    if (!aboutMobileLayout.matches || aboutFocusFrame !== null) {
+        return;
+    }
+
+    aboutFocusFrame = window.requestAnimationFrame(() => {
+        aboutFocusFrame = null;
+        updateMobileAboutFocus();
+    });
 }
 
 function stepAboutFocus(direction) {
@@ -885,6 +965,8 @@ function stepAboutFocus(direction) {
 
 if (aboutMe) {
     aboutMe.addEventListener("wheel", event => {
+        if (aboutMobileLayout.matches) return;
+
         event.preventDefault();
 
         if (aboutWheelLocked) return;
@@ -916,6 +998,20 @@ if (aboutMe) {
 
     aboutMe.addEventListener("touchstart", event => {
         aboutTouchStartY = event.touches[0]?.clientY ?? null;
+
+        if (aboutMobileLayout.matches) {
+            aboutTouchFocusY = aboutTouchStartY;
+            requestMobileAboutFocusUpdate();
+        }
+    }, { passive: true });
+
+    aboutMe.addEventListener("touchmove", event => {
+        if (!aboutMobileLayout.matches) return;
+
+        aboutTouchFocusY =
+            event.touches[0]?.clientY ?? aboutTouchFocusY;
+
+        requestMobileAboutFocusUpdate();
     }, { passive: true });
 
     aboutMe.addEventListener("touchend", event => {
@@ -925,16 +1021,29 @@ if (aboutMe) {
         const distance = aboutTouchStartY - touchEndY;
         aboutTouchStartY = null;
 
+        if (aboutMobileLayout.matches) {
+            aboutTouchFocusY = touchEndY;
+            requestMobileAboutFocusUpdate();
+            return;
+        }
+
         if (Math.abs(distance) >= 40) {
             stepAboutFocus(distance > 0 ? 1 : -1);
         }
     }, { passive: true });
+
+    aboutMe.addEventListener(
+        "scroll",
+        requestMobileAboutFocusUpdate,
+        { passive: true }
+    );
 }
 
 function triggerAboutEntrance() {
     if (!aboutText || !aboutMe || !aboutContentLines.length) return;
 
     aboutMe.scrollTop = 0;
+    aboutTouchFocusY = null;
     focusedAboutIndex = -1;
     setAboutFocus(0);
     aboutWheelTotal = 0;
