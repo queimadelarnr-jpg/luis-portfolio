@@ -19,15 +19,17 @@
 	</head>
 	<body>
 		<div class="name">
-				<h1 class="title">Luis Queimadela</h1>
+				<h1 class="title">
+					<a class="home-title-link" href="#home" aria-label="Go to home">Luis Queimadela</a>
+				</h1>
 				<p class="available">*<span class="free">available for freelance</span>*</p>
 		</div>
 		<main class="content">
 
-			<section class="page page-visible" data-page="home">
+			<section class="page page-visible" data-page="home" id="home">
 				<div class="marquee-wrap">
 
-				<div class="marquee-row row-top">
+				<div class="marquee-row row-one">
 					<div class="marquee-track">
 						<div class="marquee-group">
 							<span> WEB DESIGNER × </span>
@@ -38,7 +40,7 @@
 					</div>
 				</div>
 
-				<div class="marquee-row row-mid">
+				<div class="marquee-row row-two">
 					<div class="marquee-track reverse">
 						<div class="marquee-group">
 							<span> WEB DESIGNER × </span>
@@ -49,7 +51,7 @@
 					</div>
 				</div>
 
-				<div class="marquee-row row-bottom">
+				<div class="marquee-row row-three">
 					<div class="marquee-track">
 						<div class="marquee-group">
 							<span> WEB DESIGNER × </span>
@@ -60,8 +62,37 @@
 					</div>
 				</div>
 
-				<div class="photo">
-					<img src="img/ME.png" alt="photo of Luis">
+				<div class="marquee-row row-four">
+					<div class="marquee-track reverse">
+						<div class="marquee-group">
+							<span> WEB DESIGNER × </span>
+						</div>
+						<div class="marquee-group" aria-hidden="true">
+							<span> WEB DESIGNER × </span>
+						</div>
+					</div>
+				</div>
+
+				<div class="woven-photo" role="img" aria-label="Photo of Luis">
+					<div class="photo-tile tile-1"></div>
+					<div class="photo-tile tile-2"></div>
+					<div class="photo-tile tile-3"></div>
+					<div class="photo-tile tile-4"></div>
+
+					<div class="photo-tile tile-5"></div>
+					<div class="photo-tile tile-6"></div>
+					<div class="photo-tile tile-7"></div>
+					<div class="photo-tile tile-8"></div>
+
+					<div class="photo-tile tile-9"></div>
+					<div class="photo-tile tile-10"></div>
+					<div class="photo-tile tile-11"></div>
+					<div class="photo-tile tile-12"></div>
+
+					<div class="photo-tile tile-13"></div>
+					<div class="photo-tile tile-14"></div>
+					<div class="photo-tile tile-15"></div>
+					<div class="photo-tile tile-16"></div>
 				</div>
 
 			</div>
@@ -69,23 +100,48 @@
 
 			<section class="page about" data-page="about">
 				<div class="photo_about">
-					<img src="img/ME.png" alt="photo of Luis" class="photo-variant active">
-					<img src="img/ME_classical.png" alt="photo of Luis — classical bust style" class="photo-variant">
-					<img src="img/ME_pop.png" alt="photo of Luis — pop art style" class="photo-variant">
-					<img src="img/ME_tattoo.png" alt="photo of Luis — tattoo line art style" class="photo-variant">
+					<img src="img/me_about.png" alt="Photo of Luis" class="about-photo-base">
+
+					<div class="about-eye-slices" aria-hidden="true">
+						<img src="img/me_slice1.png" alt="" class="about-eye-slice active">
+						<img src="img/me_slice2.png" alt="" class="about-eye-slice">
+						<img src="img/me_slice3.png" alt="" class="about-eye-slice">
+						<img src="img/me_slice4.png" alt="" class="about-eye-slice">
+					</div>
 				</div>
-				<div class="page-inner about_me">
-					<p class="about-text">
-						<span class="spacer" aria-hidden="true"></span>
+				<div class="about-copy">
+					<div class="page-inner about_me" tabindex="0" role="region" aria-label="About Luis">
+						<p class="about-text">
+							<span class="spacer" aria-hidden="true"></span>
 
-						<span class="line">I'm Luis, a multidisciplinary creative and web designer based in Portugal.</span>
-						<span class="line">My background has taken me through tattooing, photography, product design, and running my own business — experiences that have shaped the way I approach creative work today.</span>
-						<span class="line">Working across different disciplines taught me to think both visually and practically: to pay attention to detail, understand how things are made, communicate with people, and take an idea from the first sketch all the way to the finished result.</span>
-						<span class="line">Today, I bring that same mindset to web design. I'm interested in creating digital experiences where typography, imagery, motion, and interaction all work together to give a project its own character.</span>
-						<span class="line">I like making things that feel considered, purposeful, and a little different.</span>
-						<span class="line">I am currently available for freelance work.</span>
+							<span class="line in-focus">I'm Luis, a multidisciplinary creative and web designer based in Portugal.</span>
+							<span class="line">My background has taken me through tattooing, photography, product design, and running my own business — experiences that have shaped the way I approach creative work today.</span>
+							<span class="line">Working across different disciplines taught me to think both visually and practically: to pay attention to detail, understand how things are made, communicate with people, and take an idea from the first sketch all the way to the finished result.</span>
+							<span class="line">Today, I bring that same mindset to web design. I'm interested in creating digital experiences where typography, imagery, motion, and interaction all work together to give a project its own character.</span>
+							<span class="line">I like making things that feel considered, purposeful, and a little different.</span>
+							<span class="line">I am currently available for freelance work.</span>
 
-						<span class="spacer" aria-hidden="true"></span>
+							<span class="spacer" aria-hidden="true"></span>
+						</p>
+					</div>
+
+					<p class="about-scroll-hint" aria-label="Scroll to read">
+						<span class="about-scroll-hint-text" aria-hidden="true">
+							<span class="slot-letter" style="--i: 0"><span class="slot-reel"><span>S</span><span>S</span></span></span>
+							<span class="slot-letter" style="--i: 1"><span class="slot-reel"><span>C</span><span>C</span></span></span>
+							<span class="slot-letter" style="--i: 2"><span class="slot-reel"><span>R</span><span>R</span></span></span>
+							<span class="slot-letter" style="--i: 3"><span class="slot-reel"><span>O</span><span>O</span></span></span>
+							<span class="slot-letter" style="--i: 4"><span class="slot-reel"><span>L</span><span>L</span></span></span>
+							<span class="slot-letter" style="--i: 5"><span class="slot-reel"><span>L</span><span>L</span></span></span>
+							<span class="slot-space"></span>
+							<span class="slot-letter" style="--i: 6"><span class="slot-reel"><span>T</span><span>T</span></span></span>
+							<span class="slot-letter" style="--i: 7"><span class="slot-reel"><span>O</span><span>O</span></span></span>
+							<span class="slot-space"></span>
+							<span class="slot-letter" style="--i: 8"><span class="slot-reel"><span>R</span><span>R</span></span></span>
+							<span class="slot-letter" style="--i: 9"><span class="slot-reel"><span>E</span><span>E</span></span></span>
+							<span class="slot-letter" style="--i: 10"><span class="slot-reel"><span>A</span><span>A</span></span></span>
+							<span class="slot-letter" style="--i: 11"><span class="slot-reel"><span>D</span><span>D</span></span></span>
+						</span>
 					</p>
 				</div>
 			</section>
@@ -95,7 +151,12 @@
 
 					<div class="work-projects" aria-label="Selected projects">
 						<button class="work-card" type="button" data-project="drip" aria-label="Open Drip project">
-							<img src="img/drip_desktop.png" alt="Drip website mockup">
+							<img src="img/drip_desktop.png" alt="Drip website mockup" class="work-card-image">
+							<span class="work-card-slices" aria-hidden="true">
+								<span class="work-card-slice"><img src="img/drip_desktop.png" alt=""></span>
+								<span class="work-card-slice"><img src="img/drip_desktop.png" alt=""></span>
+								<span class="work-card-slice"><img src="img/drip_desktop.png" alt=""></span>
+							</span>
 							<span class="work-card-copy">
 								<span class="work-card-title">Drip.</span>
 								<span class="work-card-type">Web design · Development</span>
@@ -103,7 +164,12 @@
 						</button>
 
 						<button class="work-card" type="button" data-project="hindo" aria-label="Open Hindo project">
-							<img src="img/hindo_desktop.png" alt="Hindo website mockup">
+							<img src="img/hindo_desktop.png" alt="Hindo website mockup" class="work-card-image">
+							<span class="work-card-slices" aria-hidden="true">
+								<span class="work-card-slice"><img src="img/hindo_desktop.png" alt=""></span>
+								<span class="work-card-slice"><img src="img/hindo_desktop.png" alt=""></span>
+								<span class="work-card-slice"><img src="img/hindo_desktop.png" alt=""></span>
+							</span>
 							<span class="work-card-copy">
 								<span class="work-card-title">Hindo</span>
 								<span class="work-card-type">Web design · Development</span>
