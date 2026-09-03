@@ -1518,7 +1518,7 @@ h1 {
     text-transform: uppercase;
 }
 
-@media (min-width: 901px) and (hover: hover) and (pointer: fine) {
+@media (min-width: 901px) and (hover: hover) and (pointer: fine), (any-pointer: coarse) {
     .connect-title {
         cursor: pointer;
     }

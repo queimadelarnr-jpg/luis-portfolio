@@ -163,7 +163,24 @@ function dropMarqueeLetter(letter) {
         { transform: "translate(0, 0) rotate(0deg)", opacity: 1 },
         { transform: `translate(${drift}px, ${distance}px) rotate(${rotation}deg)`, opacity: 0 }
     ], { duration: 850, easing: "cubic-bezier(.42, 0, 1, 1)", fill: "forwards" });
-    animation.finished.catch(() => {}).finally(() => layer.remove());
+    // A falling letter is orange only while the pointer still touches it.
+    // Use a normal blend while orange so exclusion does not alter #EE9134.
+    const restingLetterColor = getComputedStyle(letter.parentElement).color;
+    let hoverFrame = 0;
+    function paintFallingHover() {
+        const box = falling.getBoundingClientRect();
+        const touching = marqueePointer &&
+            marqueePointer.x >= box.left && marqueePointer.x <= box.right &&
+            marqueePointer.y >= box.top && marqueePointer.y <= box.bottom;
+        falling.style.color = touching ? "#EE9134" : restingLetterColor;
+        layer.style.mixBlendMode = touching ? "normal" : "exclusion";
+        hoverFrame = requestAnimationFrame(paintFallingHover);
+    }
+    paintFallingHover();
+    animation.finished.catch(() => {}).finally(() => {
+        cancelAnimationFrame(hoverFrame);
+        layer.remove();
+    });
 }
 
 function hitMarqueeLetter(x, y) {
@@ -264,14 +281,14 @@ function untangleHero() {
          */
         window.setTimeout(() => {
             heroInteractionLocked = false;
-        }, 2000);
+        }, 5000);
     }, 2050);
 }
 
 if (heroMarquee && wovenPhoto && !isTouchDevice) {
     heroMarquee.addEventListener(
         "pointerenter",
-        untangleHero
+        event => { if (event.pointerType !== "touch") untangleHero(); }
     );
 
     /*
@@ -279,7 +296,8 @@ if (heroMarquee && wovenPhoto && !isTouchDevice) {
      * after the cooldown, even when the pointer stayed inside
      * the hero section.
      */
-    heroMarquee.addEventListener("pointermove", () => {
+    heroMarquee.addEventListener("pointermove", event => {
+        if (event.pointerType === "touch") return;
         const now = performance.now();
 
         if (now - lastHeroPointerTrigger < 250) {
@@ -1146,6 +1164,21 @@ const connectTitle = document.querySelector(
     ".connect-title"
 );
 
+// Wrap only text nodes, preserving the existing line break and title layout.
+if (connectTitle) {
+    Array.from(connectTitle.childNodes).forEach(node => {
+        if (node.nodeType !== 3) return;
+        const fragment = document.createDocumentFragment();
+        Array.from(node.textContent).forEach(character => {
+            const letter = document.createElement("span");
+            letter.className = "connect-base-letter";
+            letter.textContent = character;
+            fragment.appendChild(letter);
+        });
+        node.replaceWith(fragment);
+    });
+}
+
 const connectTitleCanAnimate = window.matchMedia(
     "(min-width: 901px) and (hover: hover) and (pointer: fine)"
 );
@@ -1163,8 +1196,9 @@ function createConnectTitleAnimation() {
     const viewportMiddle = window.innerWidth / 2;
     const characterData = [];
 
-    Array.from(connectTitle.childNodes).forEach(node => {
-        if (node.nodeType !== 3) return;
+    Array.from(connectTitle.querySelectorAll(".connect-base-letter")).forEach(baseLetter => {
+        const node = baseLetter.firstChild;
+        if (!node || node.nodeType !== 3) return;
 
         Array.from(node.textContent).forEach((character, index) => {
             if (/\s/.test(character)) return;
@@ -1271,11 +1305,11 @@ function createConnectTitleAnimation() {
     };
 }
 
-function animateConnectTitle() {
+function animateConnectTitle(fromTouch = false) {
     if (
         !connectTitle ||
         connectTitleLocked ||
-        !connectTitleCanAnimate.matches ||
+        (!connectTitleCanAnimate.matches && fromTouch !== true) ||
         connectReducedMotion.matches
     ) {
         return;
@@ -1300,14 +1334,44 @@ function animateConnectTitle() {
 
         window.setTimeout(() => {
             connectTitleLocked = false;
-        }, 1000);
+        }, 5000);
     }, animationTime);
 }
 
 connectTitle?.addEventListener(
     "pointerenter",
-    animateConnectTitle
+    event => { if (event.pointerType !== "touch") animateConnectTitle(); }
 );
+
+// Treat a short, stationary touch as a tap; leave scrolling and swipes alone.
+function addAnimationTap(element, action, containsPoint = () => true) {
+    if (!element) return;
+    let start = null;
+    element.addEventListener("pointerdown", event => {
+        if (event.pointerType !== "touch" || !event.isPrimary ||
+            !containsPoint(event.clientX, event.clientY)) return;
+        start = { id: event.pointerId, x: event.clientX, y: event.clientY, time: performance.now() };
+    }, { passive: true });
+    element.addEventListener("pointermove", event => {
+        if (start?.id === event.pointerId &&
+            Math.hypot(event.clientX - start.x, event.clientY - start.y) > 12) start = null;
+    }, { passive: true });
+    element.addEventListener("pointerup", event => {
+        const tap = start;
+        start = null;
+        if (!tap || tap.id !== event.pointerId || performance.now() - tap.time > 600) return;
+        if (Math.hypot(event.clientX - tap.x, event.clientY - tap.y) <= 12 &&
+            containsPoint(event.clientX, event.clientY)) action();
+    }, { passive: true });
+    element.addEventListener("pointercancel", () => { start = null; }, { passive: true });
+}
+
+addAnimationTap(heroMarquee, untangleHero, (x, y) => {
+    if (!wovenPhoto) return false;
+    const rect = wovenPhoto.getBoundingClientRect();
+    return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
+});
+addAnimationTap(connectTitle, () => animateConnectTitle(true));
 
 /* =========================================
    WORK — image carousels
