@@ -61,112 +61,161 @@ if (!isTouchDevice && cursorBall) {
 }
 
 /* =========================================
-   MARQUEE
+   MARQUEE — individual falling letters
 ========================================= */
 
 const marqueeRows = document.querySelectorAll(".marquee-track");
 const marqueeSpeed = 0.6;
-
+const marqueeStates = new Map();
+const marqueeReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 let scrollDirection = 1;
 let lastScrollY = window.scrollY;
-
-const marqueeStates = new Map();
+let marqueePointer = null;
 
 window.addEventListener("scroll", () => {
     const currentScrollY = window.scrollY;
-
-    if (currentScrollY > lastScrollY) {
-        scrollDirection = 1;
-    } else if (currentScrollY < lastScrollY) {
-        scrollDirection = -1;
+    if (currentScrollY !== lastScrollY) {
+        scrollDirection = currentScrollY > lastScrollY ? 1 : -1;
     }
-
     lastScrollY = currentScrollY;
 }, { passive: true });
 
-function setupMarquee(track) {
-    const groups = track.querySelectorAll(".marquee-group");
-
-    const firstGroup = groups[0];
-    const secondGroup = groups[1];
-
-    if (!firstGroup || !secondGroup) return;
-
-    const isReverse = track.classList.contains("reverse");
-
-    firstGroup.innerHTML = "";
-    secondGroup.innerHTML = "";
-
-    const text = " WEB DESIGNER×";
-
-    while (firstGroup.scrollWidth < window.innerWidth * 1.5) {
-        const span = document.createElement("span");
-
-        span.textContent = text;
-        firstGroup.appendChild(span);
+function createMarqueeWord() {
+    const word = document.createElement("span");
+    word.className = "marquee-word";
+    word.setAttribute("aria-label", "WEB DESIGNER ×");
+    for (const character of " WEB DESIGNER ×") {
+        const letter = document.createElement("span");
+        letter.className = character === " " ? "marquee-space" : "marquee-letter";
+        letter.textContent = character === " " ? "\u00a0" : character;
+        letter.setAttribute("aria-hidden", "true");
+        word.appendChild(letter);
     }
+    return word;
+}
 
-    firstGroup.querySelectorAll("span").forEach(span => {
-        secondGroup.appendChild(span.cloneNode(true));
+function restoreMarqueeWord(word) {
+    word.querySelectorAll(".is-fallen").forEach(letter => {
+        letter.classList.remove("is-fallen");
     });
+}
 
-    const loopWidth = firstGroup.getBoundingClientRect().width;
-    const initialX = isReverse ? -loopWidth : 0;
-
+function setupMarquee(track) {
+    track.replaceChildren(createMarqueeWord());
+    const wordWidth = track.firstElementChild.getBoundingClientRect().width;
+    if (!wordWidth) return;
+    // Extra complete words keep both edges covered while recycling.
+    const count = Math.ceil(window.innerWidth / wordWidth) + 3;
+    for (let index = 1; index < count; index++) {
+        track.appendChild(createMarqueeWord());
+    }
     marqueeStates.set(track, {
-        x: initialX,
-        loopWidth,
-        baseDirection: isReverse ? -1 : 1
+        x: -wordWidth,
+        baseDirection: track.classList.contains("reverse") ? -1 : 1
     });
-
-    track.style.transform = `translate3d(${initialX}px, 0, 0)`;
+    track.style.transform = `translate3d(${-wordWidth}px, 0, 0)`;
 }
 
 function setupAllMarquees() {
-    marqueeRows.forEach(track => {
-        setupMarquee(track);
-    });
+    marqueeRows.forEach(setupMarquee);
 }
 
 setupAllMarquees();
-
+// Use the final font metrics before the user starts interacting.
+document.fonts?.ready.then(setupAllMarquees);
 let resizeTimer;
-
 window.addEventListener("resize", () => {
     clearTimeout(resizeTimer);
-
-    resizeTimer = window.setTimeout(() => {
-        setupAllMarquees();
-    }, 150);
+    resizeTimer = window.setTimeout(setupAllMarquees, 150);
 });
 
-function animateMarquee() {
-    marqueeRows.forEach(track => {
-        const state = marqueeStates.get(track);
-
-        if (!state || !state.loopWidth) return;
-
-        state.x +=
-            marqueeSpeed *
-            scrollDirection *
-            state.baseDirection;
-
-        if (state.x <= -state.loopWidth) {
-            state.x += state.loopWidth;
-        }
-
-        if (state.x >= 0) {
-            state.x -= state.loopWidth;
-        }
-
-        track.style.transform =
-            `translate3d(${state.x}px, 0, 0)`;
+function dropMarqueeLetter(letter) {
+    if (letter.classList.contains("is-fallen") || marqueeReducedMotion.matches) return;
+    const rect = letter.getBoundingClientRect();
+    const hero = letter.closest(".marquee-wrap");
+    if (!hero) return;
+    const bounds = hero.getBoundingClientRect();
+    const style = getComputedStyle(letter);
+    const layer = document.createElement("div");
+    layer.className = "marquee-fall-layer";
+    layer.setAttribute("aria-hidden", "true");
+    Object.assign(layer.style, {
+        left: `${bounds.left}px`, top: `${bounds.top}px`,
+        width: `${bounds.width}px`, height: `${bounds.height}px`
     });
-
-    requestAnimationFrame(animateMarquee);
+    const falling = document.createElement("span");
+    falling.textContent = letter.textContent;
+    falling.className = "marquee-falling-glyph";
+    Object.assign(falling.style, {
+        left: `${rect.left - bounds.left}px`, top: `${rect.top - bounds.top}px`,
+        fontFamily: style.fontFamily, fontSize: style.fontSize,
+        fontWeight: style.fontWeight, lineHeight: style.lineHeight,
+        letterSpacing: style.letterSpacing, color: style.color
+    });
+    layer.appendChild(falling);
+    document.body.appendChild(layer);
+    // Keep the original letter's width so the surrounding text never shifts.
+    letter.classList.add("is-fallen");
+    const drift = (Math.random() - .5) * 100;
+    const rotation = (Math.random() - .5) * 110;
+    const distance = Math.max(180, bounds.bottom - rect.top + rect.height);
+    const animation = falling.animate([
+        { transform: "translate(0, 0) rotate(0deg)", opacity: 1 },
+        { transform: `translate(${drift}px, ${distance}px) rotate(${rotation}deg)`, opacity: 0 }
+    ], { duration: 850, easing: "cubic-bezier(.42, 0, 1, 1)", fill: "forwards" });
+    animation.finished.catch(() => {}).finally(() => layer.remove());
 }
 
-animateMarquee();
+function hitMarqueeLetter(x, y) {
+    const letter = document.elementFromPoint(x, y)?.closest(".marquee-letter");
+    if (letter) dropMarqueeLetter(letter);
+}
+
+if (!isTouchDevice) {
+    window.addEventListener("pointermove", event => {
+        if (event.pointerType === "touch") return;
+        marqueePointer = { x: event.clientX, y: event.clientY };
+        hitMarqueeLetter(event.clientX, event.clientY);
+    }, { passive: true });
+    document.documentElement.addEventListener("pointerleave", () => { marqueePointer = null; });
+    window.addEventListener("blur", () => { marqueePointer = null; });
+}
+
+let marqueePreviousTime = 0;
+function animateMarquee(time) {
+    const step = marqueePreviousTime ? Math.min((time - marqueePreviousTime) / 16.667, 3) : 1;
+    marqueePreviousTime = time;
+    marqueeRows.forEach(track => {
+        const state = marqueeStates.get(track);
+        if (!state || !track.firstElementChild) return;
+        state.x += marqueeSpeed * step * scrollDirection * state.baseDirection;
+        let firstWidth = track.firstElementChild.getBoundingClientRect().width;
+        if (!firstWidth) return;
+        // Recycle only entire words that have left the viewport. Each word
+        // retains its missing letters until it is recycled for a new pass.
+        while (state.x <= -firstWidth) {
+            const first = track.firstElementChild;
+            track.appendChild(first);
+            restoreMarqueeWord(first);
+            state.x += firstWidth;
+            firstWidth = track.firstElementChild.getBoundingClientRect().width;
+        }
+        while (state.x > 0) {
+            const last = track.lastElementChild;
+            const lastWidth = last.getBoundingClientRect().width;
+            track.prepend(last);
+            restoreMarqueeWord(last);
+            state.x -= lastWidth;
+        }
+        track.style.transform = `translate3d(${state.x}px, 0, 0)`;
+    });
+    // Moving letters also collide with a mouse held still over the marquee.
+    if (marqueePointer && !marqueeReducedMotion.matches) {
+        hitMarqueeLetter(marqueePointer.x, marqueePointer.y);
+    }
+    requestAnimationFrame(animateMarquee);
+}
+requestAnimationFrame(animateMarquee);
 
 /* =========================================
    HERO — WOVEN PORTRAIT INTERACTION
@@ -215,7 +264,7 @@ function untangleHero() {
          */
         window.setTimeout(() => {
             heroInteractionLocked = false;
-        }, 5000);
+        }, 2000);
     }, 2050);
 }
 
@@ -1251,7 +1300,7 @@ function animateConnectTitle() {
 
         window.setTimeout(() => {
             connectTitleLocked = false;
-        }, 5000);
+        }, 1000);
     }, animationTime);
 }
 

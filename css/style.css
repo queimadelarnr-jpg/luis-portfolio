@@ -720,7 +720,7 @@ h1 {
     width: min(970px, 100%);
     min-width: 0;
     max-width: 970px;
-    height: min(68vh, 560px);
+    height: min(65vh, 560px);
     max-height: 100%;
     display: flex;
     flex-direction: column;
@@ -771,7 +771,6 @@ h1 {
     align-items: center;
     justify-content: center;
     min-height: 1.2em;
-    margin: 14px 10px 0 0;
     color: var(--black);
     font-family: var(--font);
     font-size: clamp(11px, .85vw, 14px);
@@ -885,7 +884,7 @@ h1 {
 .line.in-focus {
     opacity: 1;
     font-weight: 400;
-    font-size: clamp(36px, 4.25vw, 66px);
+    font-size: clamp(35px, 2.25vw, 66px);
     line-height: 1.06;
 }
 
@@ -1795,4 +1794,80 @@ h1 {
 
         font-size: clamp(14px, 4.5vw, 18px);
     }
+}
+
+/* Align the desktop About portrait with the Home/About menu divider. */
+@media (min-width: 901px) {
+    .about {
+        --about-side-padding: clamp(20px, 3vw, 52px);
+        --about-column-gap: clamp(32px, 5vw, 80px);
+        display: grid;
+        grid-template-columns: 25% minmax(0, 1fr);
+        column-gap: 0;
+        padding-inline: 0;
+    }
+
+    .photo_about {
+        position: absolute;
+        top: 50%;
+        left: 25%;
+        width: calc(25% - var(--about-side-padding));
+        min-width: 0;
+        margin: 0;
+        transform: translate(-100%, -50%);
+    }
+
+    .about-copy {
+        grid-column: 2;
+        width: calc(100% - var(--about-column-gap) - var(--about-side-padding));
+        margin-left: var(--about-column-gap);
+        justify-self: start;
+    }
+}
+
+/* Falling letters retain their slots until the word is recycled. */
+.marquee-track .marquee-word {
+    display: flex;
+    flex: 0 0 auto;
+}
+.marquee-track .marquee-letter,
+.marquee-track .marquee-space {
+    display: inline-block;
+    flex: 0 0 auto;
+}
+.marquee-track .marquee-space { pointer-events: none; }
+.marquee-track .marquee-letter.is-fallen {
+    opacity: 0;
+    pointer-events: none;
+}
+.marquee-fall-layer {
+    position: fixed;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 9999;
+    mix-blend-mode: exclusion;
+}
+.marquee-falling-glyph {
+    position: absolute;
+    display: block;
+    white-space: pre;
+    pointer-events: none;
+    transform-origin: 50% 70%;
+    will-change: transform, opacity;
+}
+
+
+/* Letter-only orange contact, including moving letter reels and split glyphs. */
+@media (hover: hover) and (pointer: fine) {
+    .home-title-link .name-letter:hover,
+    .connect-title:not(.is-splitting) .connect-base-letter:hover,
+    .connect-title .connect-title-letter:hover {
+        color: #EE9134;
+    }
+    .connect-title .connect-title-letter { pointer-events: auto; }
+    .connect-title.is-splitting .connect-base-letter {
+        color: transparent;
+        pointer-events: none;
+    }
+    .marquee-track .marquee-letter:hover { color: #EE9134; }
 }
