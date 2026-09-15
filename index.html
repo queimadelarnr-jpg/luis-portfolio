@@ -35,77 +35,25 @@
 		</button>
 		</div>
 		<main class="content">
+            <button class="cube-back" type="button" hidden aria-label="Go back to Home">← BACK</button>
 
 			<section class="page page-visible" data-page="home" id="home">
-				<div class="marquee-wrap">
-
-				<div class="marquee-row row-one">
-					<div class="marquee-track">
-						<div class="marquee-group">
-							<span> WEB DESIGNER × </span>
-						</div>
-						<div class="marquee-group" aria-hidden="true">
-							<span> WEB DESIGNER × </span>
-						</div>
-					</div>
-				</div>
-
-				<div class="marquee-row row-two">
-					<div class="marquee-track reverse">
-						<div class="marquee-group">
-							<span> WEB DESIGNER × </span>
-						</div>
-						<div class="marquee-group" aria-hidden="true">
-							<span> WEB DESIGNER × </span>
-						</div>
-					</div>
-				</div>
-
-				<div class="marquee-row row-three">
-					<div class="marquee-track">
-						<div class="marquee-group">
-							<span> WEB DESIGNER × </span>
-						</div>
-						<div class="marquee-group" aria-hidden="true">
-							<span> WEB DESIGNER × </span>
-						</div>
-					</div>
-				</div>
-
-				<div class="marquee-row row-four">
-					<div class="marquee-track reverse">
-						<div class="marquee-group">
-							<span> WEB DESIGNER × </span>
-						</div>
-						<div class="marquee-group" aria-hidden="true">
-							<span> WEB DESIGNER × </span>
-						</div>
-					</div>
-				</div>
-
-				<div class="woven-photo" role="img" aria-label="Photo of Luis">
-					<div class="photo-tile tile-1"></div>
-					<div class="photo-tile tile-2"></div>
-					<div class="photo-tile tile-3"></div>
-					<div class="photo-tile tile-4"></div>
-
-					<div class="photo-tile tile-5"></div>
-					<div class="photo-tile tile-6"></div>
-					<div class="photo-tile tile-7"></div>
-					<div class="photo-tile tile-8"></div>
-
-					<div class="photo-tile tile-9"></div>
-					<div class="photo-tile tile-10"></div>
-					<div class="photo-tile tile-11"></div>
-					<div class="photo-tile tile-12"></div>
-
-					<div class="photo-tile tile-13"></div>
-					<div class="photo-tile tile-14"></div>
-					<div class="photo-tile tile-15"></div>
-					<div class="photo-tile tile-16"></div>
-				</div>
-
-			</div>
+                <div class="cube-home">
+                    <div class="cube-stage" tabindex="0" role="region" aria-label="Interactive Rubik-style cube. Scroll or use the arrow keys to solve. Explore preview tiles to visit section faces. Tab to a tile and press Enter to explore.">
+                        <div class="cube-shadow" aria-hidden="true"></div>
+                        <p class="cube-fallback">Loading the cube…</p>
+                    </div>
+                    <div class="cube-caption">
+                        <p class="cube-hint">SCROLL TO COMPLETE ME</p>
+                        <div class="cube-controls">
+                            <button type="button" data-cube-step="-1" aria-label="Reverse one cube turn" disabled>↑</button>
+                            <span class="cube-progress" role="status" aria-live="polite">0 / 6</span>
+                            <button type="button" data-cube-step="1" aria-label="Complete the next cube turn" disabled>↓</button>
+                        </div>
+                        <button class="cube-autocomplete" type="button">COMPLETE FOR ME ↗</button>
+                        <p class="cube-instruction">Scroll down to solve · up to rewind</p>
+                    </div>
+                </div>
 			</section>
 
 			<section class="page about" data-page="about">
@@ -159,39 +107,7 @@
 			<section class="page" data-page="work">
 				<div class="page-inner work-inner">
 
-					<div class="work-projects" aria-label="Selected projects">
-						<button class="work-card" type="button" data-project="drip" aria-label="Open Drip project">
-							<img src="img/drip_desktop.png" alt="Drip website mockup" class="work-card-image">
-							<span class="work-card-slices" aria-hidden="true">
-								<span class="work-card-slice"><img src="img/drip_desktop.png" alt=""></span>
-								<span class="work-card-slice"><img src="img/drip_desktop.png" alt=""></span>
-								<span class="work-card-slice"><img src="img/drip_desktop.png" alt=""></span>
-							</span>
-							<span class="work-card-copy">
-								<span class="work-card-title">Drip.</span>
-								<span class="work-card-type">Web design · Development</span>
-							</span>
-						</button>
-
-						<button class="work-card" type="button" data-project="hindo" aria-label="Open Hindo project">
-							<img src="img/hindo_desktop.png" alt="Hindo website mockup" class="work-card-image">
-							<span class="work-card-slices" aria-hidden="true">
-								<span class="work-card-slice"><img src="img/hindo_desktop.png" alt=""></span>
-								<span class="work-card-slice"><img src="img/hindo_desktop.png" alt=""></span>
-								<span class="work-card-slice"><img src="img/hindo_desktop.png" alt=""></span>
-							</span>
-							<span class="work-card-copy">
-								<span class="work-card-title">Hindo</span>
-								<span class="work-card-type">Web design · Development</span>
-							</span>
-						</button>
-					</div>
-
 					<article class="project-detail" data-project="drip">
-						<button class="project-back" type="button">
-							<i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
-							All projects
-						</button>
 
 						<div class="project-carousel">
 							<div class="carousel-track">
@@ -226,10 +142,6 @@
 					</article>
 
 					<article class="project-detail" data-project="hindo">
-						<button class="project-back" type="button">
-							<i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
-							All projects
-						</button>
 
 						<div class="project-carousel">
 							<div class="carousel-track">
@@ -313,34 +225,7 @@
 			</section>
 	
 		</main>
-		<nav class="menu">
-			<button class="menu-toggle" aria-label="Toggle menu" aria-expanded="false">
-				<span class="menu-toggle-label">MENU</span>
-			</button>
 
-			<div class="menu-items">
-				<button class="menu-item active" data-page="home">
-					<span class="menu-fill"></span>
-					<span class="menu-label">HOME</span>
-				</button>
-				<button class="menu-item" data-page="about">
-					<span class="menu-fill"></span>
-					<span class="menu-label">ABOUT</span>
-				</button>
-				<button class="menu-item" data-page="work">
-					<span class="menu-fill"></span>
-					<span class="menu-label">WORK</span>
-				</button>
-				<button class="menu-item" data-page="connect">
-					<span class="menu-fill"></span>
-					<span class="menu-label">CONNECT</span>
-				</button>
-				<button class="menu-item menu-back" type="button" aria-label="Close menu">
-					<span class="menu-fill"></span>
-					<span class="menu-label">BACK</span>
-				</button>
-			</div>
-		</nav>
 		
 			<div class="cursor-ball"></div>
 		<!-- Livraria jQuery -->
@@ -357,5 +242,8 @@
 			<!-- importar o meu script -->
 
 		<script src="js/scripts.js"> </script>
+        <script defer src="js/vendor/three.min.js"></script>
+        <script defer src="js/cube-images.js"></script>
+        <script defer src="js/home-cube.js"></script>
 	</body>
 </html>
