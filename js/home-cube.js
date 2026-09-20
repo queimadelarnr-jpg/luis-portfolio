@@ -86,6 +86,7 @@
         about: { title:'Read more about me', section:'about', image:'img/me_about.png', text:'ABOUT / LUIS', previewText: "I'm Luis, a multidisciplinary creative and web designer based in Portugal. My background spans tattooing, photography and product design." },
         story: { title:'Tattooing, photography and design', section:'about', text:'TATTOO / PHOTO / DESIGN', interactive:false },
         skills: { title:'Web design, typography and interaction', section:'about', text:'WEB DESIGN / TYPOGRAPHY / INTERACTION', interactive:false },
+        game: { title:'Solve the cube', section:'work', text:'SOLVE / THE CUBE', game:true },
         drip: { title:'Drip. — web design', section:'work', project:'drip', image:'img/drip_desktop.png', text:'DRIP.' },
         hindo: { title:'Hindo — web design', section:'work', project:'hindo', image:'img/hindo_desktop.png', text:'HINDO' },
         behance: { title:'View my Behance', section:'connect', text:'BEHANCE', action:'.connect-social.behance' },
@@ -94,7 +95,7 @@
         email: { title:'Send me an email', section:'connect', text:'SEND ME / AN EMAIL', action:'.connect-email' }
     };
     const faceTiles = [
-        ['drip',null,null,null,null,null,null,null,'hindo'],
+        ['drip',null,null,null,'game',null,null,null,'hindo'],
         ['about',null,null,null,'story',null,null,null,'skills'],
         ['behance',null,'linkedin',null,null,null,'cv',null,'email'],
         ['portrait',null,null,null,'designer',null,null,null,'freelance'],
@@ -163,7 +164,7 @@
     const faceAngles={ home:[.36,-.52,-.025], work:[0,-Math.PI/2,0], about:[0,Math.PI/2,0], connect:[Math.PI/2,0,0] };
     let pointer={x:0,y:0}, wheelTotal=0, lastWheel=0, suppressClickUntil=0;
     const active = () => !broken && home.classList.contains('page-visible') && !document.hidden;
-    const interactive = () => !modalPage && active();
+    const interactive = () => !gameMode && !modalPage && active();
     function updateCaption() {
         progress.textContent = `${step} / ${sequence.length}`;
         home.dataset.cubeStep = step;
@@ -187,6 +188,7 @@
         if (!active()) { previous=0; return; }
         const dt = previous ? Math.min(time-previous,50) : 16;
         previous=time; elapsed+=dt;
+        if(gameMode){drawGame(time);return;}
         if (turn) {
             turn.elapsed+=dt;
             const t=motion.matches ? 1 : Math.min(turn.elapsed/(destination?150:520),1);
@@ -231,7 +233,12 @@
         if(!width || !height) return;
         camera.aspect=width/height;
         // Fit a bounding sphere even while a layer rotates, in either orientation.
-        const halfFov=Math.atan(Math.tan(35*Math.PI/360)*Math.min(1,camera.aspect));
+        const compact=width<=1024;
+        const reservedY=gameMode?16:(compact?96:48);
+        const usableHeight=Math.max(height*.5,height-reservedY);
+        const usableWidth=Math.max(width*.5,width-(compact?32:80));
+        const tanVertical=Math.tan(35*Math.PI/360);
+        const halfFov=Math.atan(Math.min(tanVertical*usableHeight/height,tanVertical*usableWidth/height));
         camera.position.z=2.7/Math.sin(halfFov);
         camera.updateProjectionMatrix(); renderer.setSize(width,height,false); wake();
     }
@@ -240,7 +247,7 @@
     document.addEventListener('visibilitychange',wake);
     motion.addEventListener('change',wake);
     stage.addEventListener('pointermove',event => {
-        if(event.pointerType==='touch') return;
+        if(gameMode || event.pointerType==='touch') return;
         const box=stage.getBoundingClientRect();
         pointer={x:(event.clientX-box.left)/box.width*2-1,y:(event.clientY-box.top)/box.height*2-1}; wake();
     });
@@ -303,6 +310,7 @@
             if(touchPress && !alreadyPreviewed) {showPreview(tile);return;}
             clearPreview();
             if(section==='home' || tile.item.section!==section) navigate(tile.item.section);
+            else if(tile.item.game) window.PortfolioCubeGame.open();
             else if(tile.item.action) document.querySelector(tile.item.action)?.click();
             else openContent(tile.item);
         });
@@ -328,8 +336,15 @@
         const visible=section==='home' && step===sequence.length && !turn && !destination && !modalPage;
         calloutLayer.hidden=!visible;
         if(!visible)return;
-        const width=stage.clientWidth,height=stage.clientHeight,compact=width<640;
+        const width=stage.clientWidth,height=stage.clientHeight,compact=width<=1024;
         svg.setAttribute('viewBox',`0 0 ${width} ${height}`);
+        const corners=[];
+        for(const x of [-1.5,1.5])for(const y of [-1.5,1.5])for(const z of [-1.5,1.5]){
+            const v=cube.localToWorld(new T.Vector3(x,y,z)).project(camera);
+            corners.push({x:(v.x+1)*width/2,y:(1-v.y)*height/2});
+        }
+        const cubeTop=Math.min(...corners.map(p=>p.y)),cubeBottom=Math.max(...corners.map(p=>p.y));
+
         callouts.forEach(item=>{
             const box=item.tile.button.style;
             const tx=parseFloat(box.left)+(item.side==='left'?0:parseFloat(box.width));
@@ -338,7 +353,7 @@
             let x,y;
             if(compact) {
                 x=item.side==='left'?12:width-labelWidth-12;
-                y=item.below?height-labelHeight-(item.side==='left'?28:8):16;
+                y=item.below?cubeBottom+8:cubeTop-labelHeight-8;
             } else {
                 x=item.side==='left'?tx-labelWidth-60:tx+60;
                 y=ty+(item.below?55:-70);
@@ -394,6 +409,7 @@
         instruction.textContent=section==='home'?'Scroll to complete · scroll up to rewind · or explore a tile':matchMedia('(pointer:coarse)').matches?'Tap to preview · tap again to open · swipe down to go back':'Hover to reveal · click to open · scroll up to go back';
     }
     function navigate(name) {
+        if(gameMode)gameExit();
         if(!faceAngles[name] || broken)return;
         if(modalPage) { dialog.close(); restoreContent(); }
         clearPreview();
@@ -440,6 +456,149 @@
     },true);
     stage.addEventListener('keydown',event=>{if(event.key==='Escape')clearPreview();});
     home.dataset.cubeSection='home';updateInstructions();
+
+    // Play directly with the existing navigation cube. Save exact portfolio state first.
+    let gameMode=false,gameSession=null,gameTurn=null,gameSaved=null,gameDrag=null;
+    let gameMaterials=null;
+    const gameUI=()=>window.PortfolioCubeGame;
+    function restoreGamePieces(){
+        pieces.forEach((piece,i)=>{piece.position.copy(gameSaved.pieces[i].position);piece.quaternion.copy(gameSaved.pieces[i].quaternion);});
+    }
+    function gameReset(shuffle){
+        gameTurn=null;gameDrag=null;gamePointers.clear();restoreGamePieces();
+        if(shuffle)gameSession.shuffle();else gameSession.reset();
+        const specs=window.PortfolioCubeGameModel.faces;
+        gameSession.scramble.forEach(move=>{const spec=specs[move.face],axis=['x','y','z'][spec.axis];commit(select(axis,spec.layer),axis,spec.sign*(move.inverse?-1:1)*Math.PI/2);});
+        gamePaintStats();wake();
+    }
+    function gameEnter(){
+        if(gameMode||turn||destination||section!=='work'||broken)return;
+        clearPreview();
+        gameSession=new window.PortfolioCubeGameModel.Session();
+        gameSaved={pieces:pieces.map(piece=>({position:piece.position.clone(),quaternion:piece.quaternion.clone()})),rotation:presentation.quaternion.clone(),position:presentation.position.clone(),surfaces:[]};
+        const specs=window.PortfolioCubeGameModel.faces;
+        if(!gameMaterials)gameMaterials=Object.fromEntries(Object.entries(specs).map(([f,s])=>[f,new T.MeshBasicMaterial({color:s.color})]));
+        pieces.forEach(piece=>piece.children.slice(1).forEach(sticker=>{
+            const face=Object.keys(specs).find(f=>{const spec=specs[f];return Math.sign(sticker.position.getComponent(spec.axis))===spec.layer;});
+            gameSaved.surfaces.push({sticker,material:sticker.material,art:sticker.children.map(child=>({child,visible:child.visible}))});
+            sticker.material=gameMaterials[face];sticker.children.forEach(child=>child.visible=false);
+        }));
+        gameMode=true;tileLayer.hidden=true;calloutLayer.hidden=true;backButton.hidden=true;
+        gameUI().show();presentation.rotation.set(.36,-.52,0);presentation.position.y=0;
+        gameReset(true);resize();stage.focus({preventScroll:true});
+    }
+    function gameExit(){
+        if(!gameMode)return;
+        gameTurn=null;gameDrag=null;gamePointers.clear();restoreGamePieces();
+        gameSaved.surfaces.forEach(({sticker,material,art})=>{sticker.material=material;art.forEach(({child,visible})=>child.visible=visible);});
+        presentation.quaternion.copy(gameSaved.rotation);presentation.position.copy(gameSaved.position);
+        gameMode=false;gameSession=null;gameSaved=null;pointer={x:0,y:0};previous=0;
+        gameUI().hide();tileLayer.hidden=false;updateCaption();updateInstructions();resize();wake();stage.focus({preventScroll:true});
+    }
+    function gamePaintStats(){if(gameSession)gameUI().update({elapsed:gameSession.elapsed(performance.now()),moves:gameSession.moves,busy:!!gameTurn,solved:gameSession.finishedAt!==null});}
+    function gameMove(face,inverse=false){
+        const spec=window.PortfolioCubeGameModel.faces[face];
+        if(spec)gameLayerMove(spec.axis,spec.layer,spec.sign*(inverse?-1:1),face,inverse);
+    }
+    function gameLayerMove(axisIndex,layer,sign,face=null,inverse=false){
+        if(!gameMode||gameTurn||broken||gameSession.finishedAt!==null)return;
+        const axis=['x','y','z'][axisIndex];gameSession.start(performance.now());
+        gameTurn={face,inverse,layer,sign,axis,angle:sign*Math.PI/2,start:performance.now(),selected:select(axis,layer).map(piece=>({piece,position:piece.position.clone(),quaternion:piece.quaternion.clone()}))};
+        gamePaintStats();wake();
+    }
+    function drawGame(now){
+        if(gameTurn){
+            const t=motion.matches?1:Math.min((now-gameTurn.start)/220,1);
+            const q=new T.Quaternion().setFromAxisAngle(vectors[gameTurn.axis],gameTurn.angle*t*t*(3-2*t));
+            gameTurn.selected.forEach(({piece,position,quaternion})=>{piece.position.copy(position).applyQuaternion(q);piece.quaternion.copy(quaternion).premultiply(q);});
+            if(t===1){gameTurn.selected.forEach(({piece})=>{piece.position.round();piece.quaternion.normalize();});gameSession.commitLayer(['x','y','z'].indexOf(gameTurn.axis),gameTurn.layer,gameTurn.sign,now);gameTurn=null;}
+        }
+        gamePaintStats();renderer.render(scene,camera);frame=requestAnimationFrame(draw);
+    }
+    window.addEventListener('portfolio-game-command',event=>{
+        const {type,face,inverse}=event.detail;
+        if(type==='enter'){gameEnter();return;}
+        if(!gameMode)return;
+        if(type==='back')gameExit();
+        else if(type==='turn')gameMove(face,inverse);
+        else if(type==='reset'||type==='shuffle')gameReset(type==='shuffle');
+        else if(type==='view'){presentation.rotation.set(.36,-.52,0);wake();}
+    });
+    const gameKeys={Q:'L',W:'U',E:'R',A:'F',S:'D',D:'B'};
+    const gamePointers=new Set();
+    function pickGameTile(x,y){
+        const box=stage.getBoundingClientRect();scene.updateMatrixWorld(true);camera.updateMatrixWorld(true);
+        raycaster.setFromCamera(new T.Vector2((x-box.left)/box.width*2-1,1-(y-box.top)/box.height*2),camera);
+        const hit=raycaster.intersectObjects(pieces,true).find(h=>h.object.visible && h.object.parent?.parent===cube);
+        if(!hit||!gameSaved.surfaces.some(s=>s.sticker===hit.object))return null;
+        const n=new T.Vector3(0,0,1).applyQuaternion(hit.object.getWorldQuaternion(new T.Quaternion())).applyQuaternion(presentation.quaternion.clone().invert());
+        const axis=[Math.abs(n.x),Math.abs(n.y),Math.abs(n.z)].indexOf(Math.max(Math.abs(n.x),Math.abs(n.y),Math.abs(n.z)));
+        return {axis,layer:Math.sign(n.getComponent(axis)),piece:hit.object.parent,point:cube.worldToLocal(hit.point.clone())};
+    }
+    function faceForLayer(axis,layer){return Object.keys(window.PortfolioCubeGameModel.faces).find(f=>{const s=window.PortfolioCubeGameModel.faces[f];return s.axis===axis&&s.layer===layer;});}
+    function swipeGameTile(hit,dx,dy){
+        const swipe=new T.Vector2(dx,dy).normalize(),box=stage.getBoundingClientRect();
+        const project=p=>{const v=cube.localToWorld(p.clone()).project(camera);return new T.Vector2(v.x*box.width/2,-v.y*box.height/2);};
+        const origin=project(hit.point);let best=null;
+        for(let axis=0;axis<3;axis++){
+            const layer=Math.round(hit.piece.position.getComponent(axis));
+            if(axis===hit.axis)continue;
+            const direction=new T.Vector3().setComponent(axis,1).cross(hit.point);
+            const tangent=project(hit.point.clone().addScaledVector(direction,.08)).sub(origin);
+            if(tangent.length()<.1)continue;
+            const score=tangent.normalize().dot(swipe);
+            if(!best||Math.abs(score)>Math.abs(best.score))best={axis,layer,score};
+        }
+        if(best && Math.abs(best.score)>.3){
+            const sign=Math.sign(best.score),face=faceForLayer(best.axis,best.layer);
+            gameLayerMove(best.axis,best.layer,sign,face,face?sign!==window.PortfolioCubeGameModel.faces[face].sign:false);
+        }else{
+            // Centre stickers have no outer row in the swipe direction: turn that face.
+            const face=faceForLayer(hit.axis,hit.layer);
+            gameMove(face,Math.abs(dx)>=Math.abs(dy)?dx<0:dy<0);
+        }
+    }
+    stage.addEventListener('pointerdown',event=>{
+        if(!gameMode||event.button!==0)return;
+        gamePointers.add(event.pointerId);
+        if(gamePointers.size>1){gameDrag=null;return;}
+        if(gameTurn)return;
+        stage.setPointerCapture(event.pointerId);
+        gameDrag={id:event.pointerId,x:event.clientX,y:event.clientY,lastX:event.clientX,lastY:event.clientY,dragged:false,type:event.pointerType,started:performance.now(),gesture:null,hit:pickGameTile(event.clientX,event.clientY)};
+    });
+    stage.addEventListener('pointermove',event=>{
+        if(!gameMode||!gameDrag||gameDrag.id!==event.pointerId)return;
+        const distance=Math.hypot(event.clientX-gameDrag.x,event.clientY-gameDrag.y);
+        if(gameDrag.type==='touch'&&!gameDrag.gesture){
+            if(performance.now()-gameDrag.started>=350)gameDrag.gesture='view';
+            else if(distance>6)gameDrag.gesture=gameDrag.hit?'row':'ignore';
+        }
+        if(distance>6)gameDrag.dragged=true;
+        if(gameDrag.dragged && (gameDrag.type!=='touch'||gameDrag.gesture==='view')){
+            presentation.rotation.y+=(event.clientX-gameDrag.lastX)*.008;
+            presentation.rotation.x+=(event.clientY-gameDrag.lastY)*.008;
+        }
+        gameDrag.lastX=event.clientX;gameDrag.lastY=event.clientY;wake();
+    });
+    stage.addEventListener('pointercancel',event=>{gamePointers.delete(event.pointerId);gameDrag=null;});
+    stage.addEventListener('pointerup',event=>{
+        gamePointers.delete(event.pointerId);
+        if(!gameMode||!gameDrag||event.pointerId!==gameDrag.id)return;
+        const drag=gameDrag;gameDrag=null;if(gameTurn)return;
+        if(drag.type==='touch'){
+            const dx=event.clientX-drag.x,dy=event.clientY-drag.y;
+            if(drag.gesture!=='view'&&drag.gesture!=='ignore'&&drag.hit&&Math.hypot(dx,dy)>=18&&(drag.gesture==='row'||performance.now()-drag.started<350))swipeGameTile(drag.hit,dx,dy);
+            return;
+        }
+        if(!drag.dragged&&drag.hit)gameMove(faceForLayer(drag.hit.axis,drag.hit.layer),event.shiftKey);
+    });
+    document.addEventListener('keydown',event=>{
+        if(!gameMode)return;
+        if(event.key==='Escape'){event.preventDefault();gameExit();return;}
+        if(event.target?.closest?.('input,textarea,select,[contenteditable="true"]'))return;
+        const face=gameKeys[event.key.toUpperCase()];
+        if(face&&!event.ctrlKey&&!event.metaKey&&!event.altKey){event.preventDefault();if(!event.repeat)gameMove(face,event.shiftKey);}
+    });
 
     presentation.rotation.set(.36,-.52,-.025);
     updateCaption(); resize(); wake();

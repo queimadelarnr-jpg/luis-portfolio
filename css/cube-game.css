@@ -1,0 +1,48 @@
+/* Puzzle controls for the navigation cube: no modal, overlay or second canvas. */
+#home .cube-home.game-playing {grid-template-rows:minmax(240px,1fr) auto;}
+#home .game-playing .cube-caption {display:none;}
+#home .game-playing .cube-stage {touch-action:none;cursor:grab;}
+#home .game-playing .cube-stage:active {cursor:grabbing;}
+#home .cube-game-panel {padding:12px clamp(16px,4vw,60px) 20px;color:var(--black);font-family:var(--font),sans-serif;}
+#home .cube-game-panel[hidden] {display:none;}
+#home .game-bar {display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+#home .game-bar strong {font:14px var(--fontMER),sans-serif;}
+#home .game-stats {font-size:11px;letter-spacing:.03em;}
+#home .game-stats output {font-size:20px;font-weight:600;font-variant-numeric:tabular-nums;}
+#home .cube-game-panel button {min-height:40px;padding:8px 12px;border:1px solid var(--black);background:var(--white);color:var(--black);font:12px var(--font),sans-serif;cursor:pointer;}
+#home .cube-game-panel button:hover:not(:disabled) {background:var(--blue);}
+#home .cube-game-panel button:disabled {opacity:.35;cursor:default;}
+#home .game-status {margin:8px 0;font-size:12px;text-align:center;}
+#home .game-turns {display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px;max-width:1000px;margin:auto;}
+#home .game-face-control {display:grid;grid-template-columns:1fr 1fr;gap:4px;}
+#home .game-face-control>span {grid-column:1/-1;font-size:11px;text-align:center;}
+#home .game-face-control>span::before {content:'';display:inline-block;width:9px;height:9px;margin-right:6px;border:1px solid #21252966;background:var(--face-color);}
+#home .game-footer {display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:10px;}
+#home .game-footer p {font-size:11px;line-height:1.4;margin:0;}
+#home .game-footer>div {display:flex;flex-wrap:wrap;gap:6px;}
+#home .game-footer button {font-size:10px;}
+#home .game-solved .game-status {background:var(--blue);padding:8px;}
+@media(max-width:640px) {
+ #home .game-turns {grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;}
+ #home .game-bar strong {font-size:11px;}
+ #home .game-stats {width:100%;text-align:center;}
+ #home .game-footer {flex-direction:column;}
+ #home .game-footer p {text-align:center;}
+ #home .game-footer>div {justify-content:center;}
+}
+
+/* Keep the puzzle and a separately scrollable control area inside the viewport. */
+#home .cube-home.game-playing {grid-template-rows:minmax(0,1fr) auto;overflow:hidden;}
+#home .game-playing .cube-game-panel {min-height:0;max-height:48dvh;overflow-y:auto;overscroll-behavior:contain;padding-bottom:max(12px,env(safe-area-inset-bottom));}
+@media(max-width:640px) {
+    #home .game-playing .cube-game-panel {padding:8px 12px 12px;max-height:50dvh;}
+    #home .game-bar {gap:6px;}
+    #home .game-status {margin:5px 0;}
+    #home .game-footer {gap:6px;}
+}
+@media(max-height:500px) and (min-width:600px) {
+    #home .cube-home.game-playing {grid-template-columns:minmax(0,1fr) minmax(260px,42%);grid-template-rows:minmax(0,1fr);}
+    #home .game-playing .cube-game-panel {max-height:100%;height:100%;padding:8px 12px;}
+    #home .game-turns {grid-template-columns:repeat(3,minmax(0,1fr));}
+    #home .game-bar,#home .game-footer {flex-direction:column;align-items:stretch;}
+}
