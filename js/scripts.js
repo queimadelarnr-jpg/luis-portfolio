@@ -9,19 +9,72 @@ const isTouchDevice = window.matchMedia(
 ).matches;
 
 /* =========================================
-   CURSOR — position + hover state
+   CURSOR — movement, hover and dialogs
 ========================================= */
 
-if (!isTouchDevice && cursorBall) {
+if (cursorBall) {
+    const cursorHome = cursorBall.parentElement;
+    const hoverSelector =
+        "a, button, input, select, textarea, label, img, h1, " +
+        ".available, .menu-item";
+
     let mouseX = 0;
     let mouseY = 0;
-
     let ballX = 0;
     let ballY = 0;
 
-    window.addEventListener("mousemove", event => {
+    // Start hidden until a mouse moves. Touch input does not need a cursor.
+    cursorBall.hidden = true;
+
+    // A modal dialog is above the entire page, even above a large z-index.
+    // Move the same cursor into it, then return it when the dialog closes.
+    function placeCursor() {
+        const openDialog = document.querySelector("dialog[open]");
+        const cursorParent = openDialog || cursorHome;
+
+        if (cursorBall.parentElement !== cursorParent) {
+            cursorParent.appendChild(cursorBall);
+        }
+    }
+
+    const dialogObserver = new MutationObserver(placeCursor);
+    dialogObserver.observe(document.body, {
+        subtree: true,
+        attributes: true,
+        attributeFilter: ["open"]
+    });
+
+    window.addEventListener("pointermove", event => {
+        if (event.pointerType !== "mouse") {
+            cursorBall.hidden = true;
+            return;
+        }
+
+        // Recheck on movement as well, so newly created dialogs are covered.
+        placeCursor();
         mouseX = event.clientX;
         mouseY = event.clientY;
+
+        if (cursorBall.hidden) {
+            ballX = mouseX;
+            ballY = mouseY;
+        }
+
+        cursorBall.hidden = false;
+        const hoveredElement = event.target.closest(hoverSelector);
+        cursorBall.classList.toggle("active", Boolean(hoveredElement));
+    });
+
+    window.addEventListener("pointerdown", event => {
+        if (event.pointerType !== "mouse") cursorBall.hidden = true;
+    });
+
+    window.addEventListener("blur", () => {
+        cursorBall.hidden = true;
+    });
+
+    document.documentElement.addEventListener("pointerleave", () => {
+        cursorBall.hidden = true;
     });
 
     function animateCursor() {
@@ -35,29 +88,6 @@ if (!isTouchDevice && cursorBall) {
     }
 
     animateCursor();
-
-    const HOVER_SELECTOR =
-        "a, button, input, select, textarea, label, img, h1, " +
-        ".available, .menu-item, .marquee-track span";
-
-    document.addEventListener("mouseover", event => {
-        const target = event.target.closest(HOVER_SELECTOR);
-
-        if (!target) return;
-
-        cursorBall.classList.add("active");
-    });
-
-    document.addEventListener("mouseout", event => {
-        const target = event.target.closest(HOVER_SELECTOR);
-
-        if (!target) return;
-        if (target.contains(event.relatedTarget)) return;
-
-        cursorBall.classList.remove("active");
-    });
-} else if (cursorBall) {
-    cursorBall.style.display = "none";
 }
 
 /* =========================================
@@ -2081,586 +2111,11 @@ if (menuBack) {
 }
 
 /* =========================================
-   ABOUT — line entrance and scroll focus
+   ABOUT — notify the portrait interaction
 ========================================= */
-
-const aboutMe =
-    document.querySelector(
-        ".about_me"
-    );
-
-const aboutText =
-    document.querySelector(
-        ".about-text"
-    );
-
-const aboutLines =
-    document.querySelectorAll(
-        ".about_me .line"
-    );
-
-const aboutContentLines =
-    Array.from(
-        aboutLines
-    ).filter(
-        line =>
-            line.textContent
-                .trim()
-                .length > 0
-    );
-
-const aboutMobileLayout =
-    window.matchMedia(
-        "(max-width: 900px)"
-    );
-
-aboutContentLines.forEach(
-    (line, index) => {
-        line.style.setProperty(
-            "--enter-delay",
-            `${0.05 + index * 0.07}s`
-        );
-    }
-);
-
-let focusedAboutIndex = 0;
-
-let aboutWheelLocked = false;
-let aboutWheelTotal = 0;
-
-let aboutTouchStartY = null;
-let aboutTouchFocusY = null;
-
-let aboutScrollTimer = null;
-let aboutFocusFrame = null;
-
-function keepAboutLineVisible(
-    line,
-    behavior = "smooth"
-) {
-    if (
-        !aboutMe ||
-        !line
-    ) {
-        return;
-    }
-
-    const containerRect =
-        aboutMe.getBoundingClientRect();
-
-    const lineRect =
-        line.getBoundingClientRect();
-
-    const edgeSpace = 12;
-
-    const visibleTop =
-        containerRect.top +
-        edgeSpace;
-
-    const visibleBottom =
-        containerRect.bottom -
-        edgeSpace;
-
-    let difference = 0;
-
-    if (
-        lineRect.top <
-        visibleTop
-    ) {
-        difference =
-            lineRect.top -
-            visibleTop;
-    } else if (
-        lineRect.bottom >
-        visibleBottom
-    ) {
-        difference =
-            lineRect.bottom -
-            visibleBottom;
-    }
-
-    if (
-        Math.abs(difference) >
-        1
-    ) {
-        aboutMe.scrollTo({
-            top:
-                aboutMe.scrollTop +
-                difference,
-
-            behavior
-        });
-    }
-}
-
-function scheduleAboutLineScroll(
-    line
-) {
-    window.requestAnimationFrame(
-        () => {
-            window.requestAnimationFrame(
-                () => {
-                    keepAboutLineVisible(
-                        line
-                    );
-                }
-            );
-        }
-    );
-
-    window.clearTimeout(
-        aboutScrollTimer
-    );
-
-    aboutScrollTimer =
-        window.setTimeout(() => {
-            keepAboutLineVisible(
-                line
-            );
-        }, 720);
-}
-
-function setAboutFocus(
-    index,
-    keepVisible = true
-) {
-    const safeIndex =
-        Math.max(
-            0,
-            Math.min(
-                index,
-                aboutContentLines.length -
-                    1
-            )
-        );
-
-    if (
-        safeIndex ===
-            focusedAboutIndex &&
-        aboutContentLines[
-            safeIndex
-        ]?.classList.contains(
-            "in-focus"
-        )
-    ) {
-        return;
-    }
-
-    focusedAboutIndex =
-        safeIndex;
-
-    aboutContentLines.forEach(
-        (line, lineIndex) => {
-            line.classList.toggle(
-                "in-focus",
-                lineIndex ===
-                    safeIndex
-            );
-        }
-    );
-
-    if (keepVisible) {
-        scheduleAboutLineScroll(
-            aboutContentLines[
-                safeIndex
-            ]
-        );
-    }
-}
-
-function updateMobileAboutFocus() {
-    if (
-        !aboutMe ||
-        !aboutMobileLayout.matches ||
-        !aboutContentLines.length
-    ) {
-        return;
-    }
-
-    const maximumScroll =
-        Math.max(
-            0,
-            aboutMe.scrollHeight -
-                aboutMe.clientHeight
-        );
-
-    if (
-        aboutTouchFocusY ===
-            null &&
-        aboutMe.scrollTop <= 1
-    ) {
-        setAboutFocus(
-            0,
-            false
-        );
-
-        return;
-    }
-
-    if (
-        aboutTouchFocusY ===
-            null &&
-        maximumScroll > 0 &&
-        aboutMe.scrollTop >=
-            maximumScroll - 1
-    ) {
-        setAboutFocus(
-            aboutContentLines.length -
-                1,
-            false
-        );
-
-        return;
-    }
-
-    const containerRect =
-        aboutMe.getBoundingClientRect();
-
-    const focusPosition =
-        aboutTouchFocusY ??
-        (
-            containerRect.top +
-            Math.min(
-                containerRect.height *
-                    0.3,
-                150
-            )
-        );
-
-    let nextFocusIndex = 0;
-
-    let nearestDistance =
-        Number.POSITIVE_INFINITY;
-
-    aboutContentLines.forEach(
-        (line, lineIndex) => {
-            const lineRect =
-                line.getBoundingClientRect();
-
-            let distance = 0;
-
-            if (
-                focusPosition <
-                lineRect.top
-            ) {
-                distance =
-                    lineRect.top -
-                    focusPosition;
-            } else if (
-                focusPosition >
-                lineRect.bottom
-            ) {
-                distance =
-                    focusPosition -
-                    lineRect.bottom;
-            }
-
-            if (
-                distance <
-                nearestDistance
-            ) {
-                nearestDistance =
-                    distance;
-
-                nextFocusIndex =
-                    lineIndex;
-            }
-        }
-    );
-
-    setAboutFocus(
-        nextFocusIndex,
-        false
-    );
-}
-
-function requestMobileAboutFocusUpdate() {
-    if (
-        !aboutMobileLayout.matches ||
-        aboutFocusFrame !== null
-    ) {
-        return;
-    }
-
-    aboutFocusFrame =
-        window.requestAnimationFrame(
-            () => {
-                aboutFocusFrame =
-                    null;
-
-                updateMobileAboutFocus();
-            }
-        );
-}
-
-function stepAboutFocus(
-    direction
-) {
-    const nextIndex =
-        Math.max(
-            0,
-            Math.min(
-                focusedAboutIndex +
-                    direction,
-
-                aboutContentLines.length -
-                    1
-            )
-        );
-
-    if (
-        nextIndex !==
-        focusedAboutIndex
-    ) {
-        setAboutFocus(
-            nextIndex
-        );
-    }
-}
-
-if (aboutMe) {
-    aboutMe.addEventListener(
-        "wheel",
-        event => {
-            if (
-                aboutMobileLayout.matches
-            ) {
-                return;
-            }
-
-            event.preventDefault();
-
-            if (
-                aboutWheelLocked
-            ) {
-                return;
-            }
-
-            aboutWheelTotal +=
-                event.deltaY;
-
-            if (
-                Math.abs(
-                    aboutWheelTotal
-                ) < 18
-            ) {
-                return;
-            }
-
-            stepAboutFocus(
-                aboutWheelTotal > 0
-                    ? 1
-                    : -1
-            );
-
-            aboutWheelTotal = 0;
-            aboutWheelLocked = true;
-
-            window.setTimeout(
-                () => {
-                    aboutWheelLocked =
-                        false;
-                },
-                520
-            );
-        },
-        { passive: false }
-    );
-
-    aboutMe.addEventListener(
-        "keydown",
-        event => {
-            if (
-                event.key ===
-                    "ArrowDown" ||
-                event.key ===
-                    "PageDown"
-            ) {
-                event.preventDefault();
-                stepAboutFocus(1);
-            }
-
-            if (
-                event.key ===
-                    "ArrowUp" ||
-                event.key ===
-                    "PageUp"
-            ) {
-                event.preventDefault();
-                stepAboutFocus(-1);
-            }
-        }
-    );
-
-    aboutMe.addEventListener(
-        "touchstart",
-        event => {
-            aboutTouchStartY =
-                event.touches[0]
-                    ?.clientY ??
-                null;
-
-            if (
-                aboutMobileLayout.matches
-            ) {
-                aboutTouchFocusY =
-                    aboutTouchStartY;
-
-                requestMobileAboutFocusUpdate();
-            }
-        },
-        { passive: true }
-    );
-
-    aboutMe.addEventListener(
-        "touchmove",
-        event => {
-            if (
-                !aboutMobileLayout.matches
-            ) {
-                return;
-            }
-
-            aboutTouchFocusY =
-                event.touches[0]
-                    ?.clientY ??
-                aboutTouchFocusY;
-
-            requestMobileAboutFocusUpdate();
-        },
-        { passive: true }
-    );
-
-    aboutMe.addEventListener(
-        "touchend",
-        event => {
-            if (
-                aboutTouchStartY ===
-                null
-            ) {
-                return;
-            }
-
-            const touchEndY =
-                event.changedTouches[0]
-                    ?.clientY ??
-                aboutTouchStartY;
-
-            const distance =
-                aboutTouchStartY -
-                touchEndY;
-
-            aboutTouchStartY =
-                null;
-
-            if (
-                aboutMobileLayout.matches
-            ) {
-                aboutTouchFocusY =
-                    touchEndY;
-
-                requestMobileAboutFocusUpdate();
-
-                return;
-            }
-
-            if (
-                Math.abs(distance) >=
-                40
-            ) {
-                stepAboutFocus(
-                    distance > 0
-                        ? 1
-                        : -1
-                );
-            }
-        },
-        { passive: true }
-    );
-
-    aboutMe.addEventListener(
-        "scroll",
-        requestMobileAboutFocusUpdate,
-        { passive: true }
-    );
-}
 
 function triggerAboutEntrance() {
-    if (
-        !aboutText ||
-        !aboutMe ||
-        !aboutContentLines.length
-    ) {
-        return;
-    }
-
-    aboutMe.scrollTop = 0;
-
-    aboutTouchFocusY = null;
-
-    focusedAboutIndex = -1;
-
-    setAboutFocus(0);
-
-    aboutWheelTotal = 0;
-
-    aboutText.classList.remove(
-        "entered"
-    );
-
-    void aboutText.offsetWidth;
-
-    aboutText.classList.add(
-        "entered"
-    );
-}
-
-/* =========================================
-   ABOUT — changing eye slices
-========================================= */
-
-const aboutEyeSlices =
-    document.querySelectorAll(
-        ".about-eye-slice"
-    );
-
-let aboutEyeSliceIndex = 0;
-
-function cycleAboutEyeSlice() {
-    if (
-        aboutEyeSlices.length <
-        2
-    ) {
-        return;
-    }
-
-    aboutEyeSlices[
-        aboutEyeSliceIndex
-    ].classList.remove(
-        "active"
-    );
-
-    aboutEyeSliceIndex =
-        (
-            aboutEyeSliceIndex +
-            1
-        ) %
-        aboutEyeSlices.length;
-
-    aboutEyeSlices[
-        aboutEyeSliceIndex
-    ].classList.add(
-        "active"
-    );
-}
-
-if (
-    aboutEyeSlices.length > 1
-) {
-    window.setInterval(
-        cycleAboutEyeSlice,
-        3000
-    );
+    window.dispatchEvent(new Event("about-open"));
 }
 
 /* =========================================

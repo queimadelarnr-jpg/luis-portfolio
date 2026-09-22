@@ -15,9 +15,10 @@
 		<link rel="stylesheet" type="text/css" href="assets/aos/css/aos.css">
 		<link rel="stylesheet" type="text/css" href="assets/fontawesome/css/all.min.css">
 
-		<link rel="stylesheet" type="text/css" href="css/style.css?v=20a8a6be8fa3">
-	    <link rel="stylesheet" href="css/cube-game.css?v=f9356002b7e8">
-	</head>
+		<link rel="stylesheet" type="text/css" href="css/style.css?v=ea3f36c40a97">
+	    <link rel="stylesheet" href="css/cube-game.css?v=e59689e0e299">
+	    <link rel="stylesheet" href="css/about-playground.css?v=2feeca65d436">
+</head>
 	<body>
 		<div class="name">
 		<h1 class="title">
@@ -57,125 +58,301 @@
                 </div>
 			</section>
 
-			<section class="page about" data-page="about">
-				<div class="photo_about">
-					<img src="img/me_about.png" alt="Photo of Luis" class="about-photo-base">
-
-					<div class="about-eye-slices" aria-hidden="true">
-						<img src="img/me_slice1.png" alt="" class="about-eye-slice active">
-						<img src="img/me_slice2.png" alt="" class="about-eye-slice">
-						<img src="img/me_slice3.png" alt="" class="about-eye-slice">
-						<img src="img/me_slice4.png" alt="" class="about-eye-slice">
-					</div>
-				</div>
-				<div class="about-copy">
-					<div class="page-inner about_me" tabindex="0" role="region" aria-label="About Luis">
-						<p class="about-text">
-							<span class="spacer" aria-hidden="true"></span>
-
-							<span class="line in-focus">I'm Luis, a multidisciplinary creative and web designer based in Portugal.</span>
-							<span class="line">My background has taken me through tattooing, photography, product design, and running my own business — experiences that have shaped the way I approach creative work today.</span>
-							<span class="line">Working across different disciplines taught me to think both visually and practically: to pay attention to detail, understand how things are made, communicate with people, and take an idea from the first sketch all the way to the finished result.</span>
-							<span class="line">Today, I bring that same mindset to web design. I'm interested in creating digital experiences where typography, imagery, motion, and interaction all work together to give a project its own character.</span>
-							<span class="line">I like making things that feel considered, purposeful, and a little different.</span>
-							<span class="line">I am currently available for freelance work.</span>
-
-							<span class="spacer" aria-hidden="true"></span>
-						</p>
-					</div>
-
-					<p class="about-scroll-hint" aria-label="Scroll to read">
-						<span class="about-scroll-hint-text" aria-hidden="true">
-							<span class="slot-letter" style="--i: 0"><span class="slot-reel"><span>S</span><span>S</span></span></span>
-							<span class="slot-letter" style="--i: 1"><span class="slot-reel"><span>C</span><span>C</span></span></span>
-							<span class="slot-letter" style="--i: 2"><span class="slot-reel"><span>R</span><span>R</span></span></span>
-							<span class="slot-letter" style="--i: 3"><span class="slot-reel"><span>O</span><span>O</span></span></span>
-							<span class="slot-letter" style="--i: 4"><span class="slot-reel"><span>L</span><span>L</span></span></span>
-							<span class="slot-letter" style="--i: 5"><span class="slot-reel"><span>L</span><span>L</span></span></span>
-							<span class="slot-space"></span>
-							<span class="slot-letter" style="--i: 6"><span class="slot-reel"><span>T</span><span>T</span></span></span>
-							<span class="slot-letter" style="--i: 7"><span class="slot-reel"><span>O</span><span>O</span></span></span>
-							<span class="slot-space"></span>
-							<span class="slot-letter" style="--i: 8"><span class="slot-reel"><span>R</span><span>R</span></span></span>
-							<span class="slot-letter" style="--i: 9"><span class="slot-reel"><span>E</span><span>E</span></span></span>
-							<span class="slot-letter" style="--i: 10"><span class="slot-reel"><span>A</span><span>A</span></span></span>
-							<span class="slot-letter" style="--i: 11"><span class="slot-reel"><span>D</span><span>D</span></span></span>
-						</span>
-					</p>
-				</div>
-			</section>
+			<section class="page about-playground" data-page="about">
+                <div class="about-scene">
+                    <h2>ABOUT ME</h2>
+                    <p class="about-play-hint" id="about-drag-help">Drag the photo to explore the text. You can also focus it and use the arrow keys.</p>
+                    <div class="about-biography">
+                        <p class="about-paragraph">I’m a web designer based in Portugal.</p>
+                        <p class="about-paragraph">My journey tattooing, photographing, design and manufacturing bespoke furniture and lighting fixtures and running my own business taught me to think both visually and practically, pay attention to detail, understand how things are made, communicate, take an idea from first sketch all the way to the finished result.</p>
+                        <p class="about-paragraph">Today, I bring that same mindset to web design. I'm interested in creating digital experiences where typography, imagery, motion, and interaction all work together to give a project its own character.</p>
+                        <p class="about-paragraph">I like making things that feel considered, purposeful, and a little different.</p>
+                        <p class="about-paragraph">I am currently available for freelance work.</p>
+                    </div>
+                    <button class="about-clear-text" type="button">MOVE PHOTO ASIDE ↗</button>
+                    <button class="about-portrait" type="button" aria-label="Move portrait of Luis" aria-describedby="about-drag-help">
+                        <img src="img/me_square.png" alt="Luis Queimadela" width="330" height="330" draggable="false">
+                    </button>
+                </div>
+            </section>
 
 			<section class="page" data-page="work">
 				<div class="page-inner work-inner">
 
-					<article class="project-detail" data-project="drip">
-
-						<div class="project-carousel">
-							<div class="carousel-track">
-								<div class="carousel-slide">
-									<img src="img/drip_desktop.png" alt="Drip website mockup — desktop">
+					<article class="project-detail showcase" data-project="drip">
+						<!-- Project overview: context, contribution and the live website link. -->
+						<header class="showcase-intro">
+							<p class="showcase-kicker">
+								02 / COFFEE, COLOUR &amp; CHARACTER
+							</p>
+							<h2>
+								Drip.
+							</h2>
+							<h3>
+								From the coffee bag to the browser.
+							</h3>
+							<p class="showcase-lead">
+								Drip. is an independent coffee brand concept with a playful attitude. I developed its identity, packaging and merchandise alongside a working website, bringing the same character to every place the brand appears.
+							</p>
+							<dl class="showcase-meta">
+								<div>
+									<dt>
+										CONTEXT
+									</dt>
+									<dd>
+										Independent concept · Course project
+									</dd>
 								</div>
-								<div class="carousel-slide">
-									<img src="img/drip_mobile.png" alt="Drip website mockup — mobile">
+								<div>
+									<dt>
+										MY CONTRIBUTION
+									</dt>
+									<dd>
+										Brand identity · Packaging &amp; merchandise · Web design &amp; implementation
+									</dd>
 								</div>
-							</div>
-
-							<button class="carousel-arrow prev" type="button" aria-label="Previous image">
-								<i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
-							</button>
-							<button class="carousel-arrow next" type="button" aria-label="Next image">
-								<i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
-							</button>
-
-							<div class="carousel-dots">
-								<span class="dot active" data-index="0"></span>
-								<span class="dot" data-index="1"></span>
-							</div>
+							</dl>
+							<a class="visit showcase-source-link" href="https://queimadelarnr-jpg.github.io/drip-website/" target="_blank" rel="noopener noreferrer">
+								VISIT PROJECT ↗
+							</a>
+						</header>
+						<figure class="showcase-image showcase-hero">
+							<img src="img/drip-macbook-collection.png" alt="The coffee collection / Desktop" width="1536" height="1024" loading="lazy" decoding="async">
+							<figcaption>
+								The coffee collection / Desktop
+							</figcaption>
+						</figure>
+						<section class="showcase-story">
+							<p class="showcase-kicker">
+								01 / THE BRAND
+							</p>
+							<h3>
+								Colour meets concrete.
+							</h3>
+							<p>
+								I imagined Drip. in a bright, post-industrial space: exposed concrete, iron and steel, with colour bringing energy to the room. The cup mascot, bold wordmark and playful graphics carry that attitude across the brand. These concept mockups place the website alongside my packaging and mug designs.
+							</p>
+						</section>
+						<div class="showcase-gallery">
+							<figure class="showcase-image">
+								<img src="img/drip-macbook-coffee.png" alt="Choosing between single origins and blends / Desktop" width="1536" height="1024" loading="lazy" decoding="async">
+								<figcaption>
+									Choosing between single origins and blends / Desktop
+								</figcaption>
+							</figure>
+							<figure class="showcase-image">
+								<img src="img/drip-macbook-colombia.png" alt="Colombia: packaging, origin and tasting notes / Desktop" width="1536" height="1024" loading="lazy" decoding="async">
+								<figcaption>
+									Colombia: packaging, origin and tasting notes / Desktop
+								</figcaption>
+							</figure>
 						</div>
-
-						<div class="project-text">
-							<h2>Drip.</h2>
-							<p>DRIP. is a coffee brand for people who care about how things are made.<br>
-							This conceptual brand came about as part of a project, for which, creating a fully working website project was the main
-							goal. I ended up creating a whole brand and concept that reflects myself as a person and creative.
-							<a href="https://queimadelarnr-jpg.github.io/drip-website/" class="visit" target="_blank" rel="noopener noreferrer" > Visit the project here <i class="fa-solid fa-chevron-right" aria-hidden="true"></i> </a></p>
+						<section class="showcase-story">
+							<p class="showcase-kicker">
+								02 / THE COFFEE
+							</p>
+							<h3>
+								Give each coffee its own identity.
+							</h3>
+							<p>
+								The packaging uses different colours and graphics to distinguish blends and origins, while the mascot and wordmark keep them recognisably Drip. On the website, product imagery leads into detail pages with information about the coffee and its taste profile.
+							</p>
+						</section>
+						<figure class="showcase-image">
+							<img src="img/drip-macbook-menu.png" alt="A closer look at the coffee range / Desktop" width="1536" height="1024" loading="lazy" decoding="async">
+							<figcaption>
+								A closer look at the coffee range / Desktop
+							</figcaption>
+						</figure>
+						<section class="showcase-story">
+							<p class="showcase-kicker">
+								03 / BEYOND THE BAG
+							</p>
+							<h3>
+								A brand you can wear. Or drink from.
+							</h3>
+							<p>
+								Mugs, T-shirts, hoodies and tote bags extend the identity beyond coffee packaging. The merchandise pages let visitors browse the range and explore product variations, keeping the products themselves at the centre of the layout.
+							</p>
+						</section>
+						<div class="showcase-gallery">
+							<figure class="showcase-image">
+								<img src="img/drip-macbook-merch.png" alt="Mugs, clothing and totes / Desktop" width="1536" height="1024" loading="lazy" decoding="async">
+								<figcaption>
+									Mugs, clothing and totes / Desktop
+								</figcaption>
+							</figure>
+							<figure class="showcase-image">
+								<img src="img/drip-macbook-tee.png" alt="The Drip. tee and its colour options / Desktop" width="1536" height="1024" loading="lazy" decoding="async">
+								<figcaption>
+									The Drip. tee and its colour options / Desktop
+								</figcaption>
+							</figure>
 						</div>
+						<section class="showcase-story">
+							<p class="showcase-kicker">
+								04 / ON MOBILE
+							</p>
+							<h3>
+								The same character, in your hand.
+							</h3>
+							<p>
+								The mobile layouts bring the products into a single-column flow with compact navigation. Large images keep packaging and print details visible, while coffee and merchandise retain the same visual language as the desktop experience.
+							</p>
+						</section>
+						<div class="showcase-gallery">
+							<figure class="showcase-image">
+								<img src="img/drip-iphone-coffee.png" alt="Browsing coffee / Mobile" width="1536" height="1024" loading="lazy" decoding="async">
+								<figcaption>
+									Browsing coffee / Mobile
+								</figcaption>
+							</figure>
+							<figure class="showcase-image">
+								<img src="img/drip-iphone-blend.png" alt="Golden Hour and the blend range / Mobile" width="1536" height="1024" loading="lazy" decoding="async">
+								<figcaption>
+									Golden Hour and the blend range / Mobile
+								</figcaption>
+							</figure>
+							<figure class="showcase-image">
+								<img src="img/drip-iphone-merch.png" alt="The merchandise collection / Mobile" width="1536" height="1024" loading="lazy" decoding="async">
+								<figcaption>
+									The merchandise collection / Mobile
+								</figcaption>
+							</figure>
+							<figure class="showcase-image">
+								<img src="img/drip-iphone-tee.png" alt="T-shirt colours and chest print / Mobile" width="1536" height="1024" loading="lazy" decoding="async">
+								<figcaption>
+									T-shirt colours and chest print / Mobile
+								</figcaption>
+							</figure>
+						</div>
+						<section class="showcase-invitation">
+							<p class="showcase-kicker">
+								TRY IT LIVE ↗
+							</p>
+							<h3>
+								Find your blend. Pick your colour.
+							</h3>
+							<p>
+								Open Drip. to explore the coffee range, read the origin and tasting details, and try the merchandise options. The live website brings the brand, products and interactions together.
+							</p>
+							<p class="showcase-note">
+								Use “Visit project” in the top bar to explore the full website.
+							</p>
+						</section>
 					</article>
 
-					<article class="project-detail" data-project="hindo">
-
-						<div class="project-carousel">
-							<div class="carousel-track">
-								<div class="carousel-slide">
-									<img src="img/hindo_desktop.png" alt="Hindo website mockup — desktop">
+										<article class="project-detail showcase" data-project="hindo">
+						<header class="showcase-intro">
+							<p class="showcase-kicker">
+								01 / MUSIC, CULTURE & INTERACTION
+							</p>
+							<h2>
+								Hindo
+							</h2>
+							<h3>
+								A place to get lost in sound.
+							</h3>
+							<p class="showcase-lead">
+								A concept for a Japanese recording studio and listening lounge, brought to life through an interactive website. Hindo explores how a digital space can carry the atmosphere of a physical one.
+							</p>
+							<dl class="showcase-meta">
+								<div>
+									<dt>
+										CONTEXT
+									</dt>
+									<dd>
+										Final project · Web Design course
+									</dd>
 								</div>
-								<div class="carousel-slide">
-									<img src="img/hindo_mobile.png" alt="Hindo website mockup — mobile">
+								<div>
+									<dt>
+										MY CONTRIBUTION
+									</dt>
+									<dd>
+										Brand concept · Web design · Website implementation
+									</dd>
 								</div>
-							</div>
-
-							<button class="carousel-arrow prev" type="button" aria-label="Previous image">
-								<i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
-							</button>
-							<button class="carousel-arrow next" type="button" aria-label="Next image">
-								<i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
-							</button>
-
-							<div class="carousel-dots">
-								<span class="dot active" data-index="0"></span>
-								<span class="dot" data-index="1"></span>
-							</div>
+							</dl>
+							<a class="visit showcase-source-link" href="https://queimadelarnr-jpg.github.io/hindo_website/" target="_blank" rel="noopener noreferrer">
+								VISIT PROJECT ↗
+							</a>
+						</header>
+						<figure class="showcase-image showcase-hero">
+							<img src="img/hindo_desktop.png" alt="Hindo website mockup — The first impression / Desktop" loading="lazy" decoding="async">
+							<figcaption>
+								The first impression / Desktop
+							</figcaption>
+						</figure>
+						<section class="showcase-story">
+							<p class="showcase-kicker">
+								THE IDEA
+							</p>
+							<h3>
+								Make the website feel like part of the venue.
+							</h3>
+							<p>
+								Records, artists and listening experiences give visitors different ways into Hindo. The visual direction pairs quiet typography with warm imagery, while the music player invites people to stop and listen.
+							</p>
+						</section>
+						<div class="showcase-gallery">
+							<figure class="showcase-image">
+								<img src="img/hindo_desktop2.png" alt="Hindo website mockup — A closer look / Desktop" loading="lazy" decoding="async">
+								<figcaption>
+									A closer look / Desktop
+								</figcaption>
+							</figure>
+							<figure class="showcase-image">
+								<img src="img/hindo_desktop3.png" alt="Hindo website mockup — Inside the experience / Desktop" loading="lazy" decoding="async">
+								<figcaption>
+									Inside the experience / Desktop
+								</figcaption>
+							</figure>
+							<figure class="showcase-image">
+								<img src="img/hindo_desktop4.png" alt="Hindo website mockup — Exploring the content / Desktop" loading="lazy" decoding="async">
+								<figcaption>
+									Exploring the content / Desktop
+								</figcaption>
+							</figure>
+							<figure class="showcase-image">
+								<img src="img/hindo_mobile.png" alt="Hindo website mockup — Hindo on the go / Mobile" loading="lazy" decoding="async">
+								<figcaption>
+									Hindo on the go / Mobile
+								</figcaption>
+							</figure>
+							<figure class="showcase-image">
+								<img src="img/hindo_mobile1.png" alt="Hindo website mockup — A smaller screen, the same world / Mobile" loading="lazy" decoding="async">
+								<figcaption>
+									A smaller screen, the same world / Mobile
+								</figcaption>
+							</figure>
+							<figure class="showcase-image">
+								<img src="img/hindo_mobile2.png" alt="Hindo website mockup — Exploring by touch / Mobile" loading="lazy" decoding="async">
+								<figcaption>
+									Exploring by touch / Mobile
+								</figcaption>
+							</figure>
+							<figure class="showcase-image">
+								<img src="img/hindo_mobile3.png" alt="Hindo website mockup — The experience in hand / Mobile" loading="lazy" decoding="async">
+								<figcaption>
+									The experience in hand / Mobile
+								</figcaption>
+							</figure>
 						</div>
-
-						<div class="project-text">
-							<h2>Hindo</h2>
-							<p>Hindo, meaning "frequency" in japanese, is a recording studio
-								and a live session lounge bar set somewhere in Japan. A made up
-								brand for the final project of my Web Design course, it's website,
-								the final project, aims to create a more immersive experience than 
-								a mere scroll through a website.  
-							<a href="https://queimadelarnr-jpg.github.io/hindo_website/" class="visit" target="_blank" rel="noopener noreferrer" > Visit the project here <i class="fa-solid fa-chevron-right" aria-hidden="true"></i> </a></p>
-						</div>
+						<section class="showcase-invitation">
+							<p class="showcase-kicker">
+								TRY IT LIVE ↗
+							</p>
+							<h3>
+								Browse the records. Play a track. Explore the space.
+							</h3>
+							<p>
+								The mockups show the visual direction. Open the live project to try the music player, explore the sections and see how the experience responds to your input.
+							</p>
+							<p class="showcase-note">
+								Use “Visit project” in the top bar to open the full experience.
+							</p>
+						</section>
 					</article>
 
 				</div>
@@ -242,11 +419,12 @@
 			
 			<!-- importar o meu script -->
 
-		<script src="js/scripts.js"> </script>
+		<script src="js/scripts.js?v=9e3feb6e8b4e"> </script>
         <script defer src="js/vendor/three.min.js"></script>
         <script defer src="js/cube-images.js"></script>
-        <script defer src="js/home-cube.js?v=72e7b0d3342b"></script>
-	    <script defer src="js/cube-game-model.js?v=5a91ff45bd8d"></script>
-        <script defer src="js/cube-game.js?v=9108e22d307d"></script>
-	</body>
+        <script defer src="js/home-cube.js?v=1917f36840dc"></script>
+	    <script defer src="js/cube-game-model.js?v=7bc4f9939505"></script>
+        <script defer src="js/cube-game.js?v=7ed8fee1d241"></script>
+	    <script defer src="js/about-playground.js?v=71d9a72d18a7"></script>
+</body>
 </html>

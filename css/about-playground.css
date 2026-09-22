@@ -1,0 +1,99 @@
+/* =========================================
+   ABOUT — readable copy and movable portrait
+========================================= */
+.about-playground {
+    background: var(--white);
+    color: var(--black);
+    overflow: auto;
+}
+.cube-content-host .about-playground.cube-content-page {
+    height: auto;
+    min-height: 100%;
+}
+.about-scene {
+    position: relative;
+    padding: clamp(24px, 5vw, 72px);
+    padding-bottom: 280px;
+    overflow: hidden;
+    min-height: 600px;
+}
+.about-scene h2 {
+    margin: 0 0 18px;
+    font: clamp(30px, 5vw, 64px)/1.1 var(--fontMUB), sans-serif;
+}
+.about-play-hint {
+    font: 13px/1.5 var(--font), sans-serif;
+    margin: 0 0 36px;
+    max-width: 600px;
+}
+.about-paragraph {
+    font: clamp(19px, 2.3vw, 30px)/1.65 var(--font), sans-serif;
+    max-width: 1000px;
+    margin: 0 0 26px;
+    -webkit-user-select: none;
+    user-select: none;
+}
+.about-word {
+    display: inline-block;
+    white-space: nowrap;
+}
+.about-letter {
+    display: inline-block;
+}
+.about-portrait {
+    position: absolute;
+    z-index: 2;
+    top: 0;
+    left: 0;
+    width: clamp(130px, 20vw, 230px);
+    padding: 0;
+    border: 0;
+    border-radius: 16px;
+    background: var(--black);
+    box-shadow: 0 14px 32px #0003;
+    cursor: grab;
+    touch-action: none;
+    -webkit-user-select: none;
+    user-select: none;
+    will-change: transform;
+}
+.about-portrait:active { cursor: grabbing; }
+.about-portrait img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: inherit;
+    pointer-events: none;
+}
+.about-portrait:focus-visible,
+.about-clear-text:focus-visible {
+    outline: 3px solid var(--orange);
+    outline-offset: 5px;
+}
+.about-clear-text {
+    position: relative;
+    z-index: 3;
+    border: 1px solid var(--black);
+    background: transparent;
+    color: var(--black);
+    padding: 10px 14px;
+    font: 12px var(--fontMER), sans-serif;
+    cursor: pointer;
+}
+.about-clear-text:hover {
+    background: var(--orange);
+}
+.about-readable {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+@media (max-width: 600px) {
+    .about-scene { padding: 24px 20px 180px; }
+    .about-paragraph { font-size: 19px; }
+}
